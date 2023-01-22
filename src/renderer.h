@@ -1,62 +1,27 @@
-#ifndef RENDERER_HPP
-#define RENDERER_HPP
+#ifndef RENDERER_H
+#define RENDERER_H
 
-#include <memory>
-#include <utility>
-#include <string>
 #include <vector>
-#include "food.hpp"
 #include "SDL.h"
-#include "SDL_image.h"
-#include "snake.hpp"
+#include "snake.h"
 
-//So I can create a unique_ptr of SDL_Window
-struct SDLWindowDeleter
-{
-  void operator()(SDL_Window* w) const
-  {
-    SDL_DestroyWindow(w);
-  }
-};
-
-//So I can create a unique_ptr of SDL_Renderer
-struct SDLRendererDeleter
-{
-  void operator()(SDL_Renderer* r) const
-  {
-    SDL_DestroyRenderer(r);
-  }
-};
-
-class Renderer
-{
-public:
-  //Constructors && Destructor
-  Renderer(const std::size_t screen_w, const std::size_t screen_h, const std::size_t grid_w, const std::size_t grid_h);
+class Renderer {
+ public:
+  Renderer(const std::size_t screen_width, const std::size_t screen_height,
+           const std::size_t grid_width, const std::size_t grid_height);
   ~Renderer();
 
-  //Typical behaviour methods
-  void Render();
-  void Render(std::shared_ptr<Snake> const &snake, Foods const &food);
-  void UpdateWindowTitle(int score, int fps, int lives, std::pair<std::string, int> high_score);
+  void Render(Snake const snake, SDL_Point const &food);
+  void UpdateWindowTitle(int score, int fps);
 
-private:
-  //SDL Variables
-  std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> m_window;
-  std::unique_ptr<SDL_Renderer, decltype(&SDL_DestroyRenderer)> m_renderer;
-  std::unique_ptr<SDL_Surface> m_surface;
+ private:
+  SDL_Window *sdl_window;
+  SDL_Renderer *sdl_renderer;
 
-  typedef std::shared_ptr<SDL_Texture> SharedTexture;
-  SharedTexture m_texture;
-
-  //Variables
-  const std::size_t m_screen_w;
-  const std::size_t m_screen_h;
-  const std::size_t m_grid_w;
-  const std::size_t m_grid_h;
-
-  //Typical behaviour methods
-  inline SharedTexture make_shared(SDL_Texture* texture) { return SharedTexture(texture, SDL_DestroyTexture); }
+  const std::size_t screen_width;
+  const std::size_t screen_height;
+  const std::size_t grid_width;
+  const std::size_t grid_height;
 };
 
-#endif /*   renderer.hpp    */
+#endif

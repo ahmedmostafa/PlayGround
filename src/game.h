@@ -1,45 +1,33 @@
-#ifndef GAME_HPP
-#define GAME_HPP
+#ifndef GAME_H
+#define GAME_H
 
-#include <algorithm>
-#include <fstream>
-#include <memory>
-#include <sstream>
-#include <string>
-#include <utility>
-#include <vector>
-
-#include "controller.hpp"
-#include "food.hpp"
-#include "renderer.hpp"
+#include <random>
 #include "SDL.h"
-#include "snake.hpp"
+#include "controller.h"
+#include "renderer.h"
+#include "snake.h"
 
-class Game
-{
-public:
-  //Constructor && Destructors
-  Game(std::size_t grid_w, std::size_t grid_h);
+class Game {
+ public:
+  Game(std::size_t grid_width, std::size_t grid_height);
+  void Run(Controller const &controller, Renderer &renderer,
+           std::size_t target_frame_duration);
+  int GetScore() const;
+  int GetSize() const;
 
-  //Typical behaviour methods
-  void Run(Controller const &controller, Renderer &renderer, std::size_t target_frame_duration);
-  void SaveScore(int score);
-  void LoadScores();
+ private:
+  Snake snake;
+  SDL_Point food;
 
-  //Getters && Setters
-  int GetScore() const { return score; }
-  int GetSize() const { return snake->getSize(); }
+  std::random_device dev;
+  std::mt19937 engine;
+  std::uniform_int_distribution<int> random_w;
+  std::uniform_int_distribution<int> random_h;
 
-private:
-  std::shared_ptr<Snake> snake;
-  Foods m_foods;
-  Uint32 m_badFood_timestamp;
   int score{0};
-  std::vector <std::pair <std::string, int> > high_scores;
 
-  //Typical behaviour methods
   void PlaceFood();
   void Update();
 };
 
-#endif /*   game.hpp    */
+#endif
