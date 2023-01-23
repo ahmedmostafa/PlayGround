@@ -15,11 +15,6 @@ class Game {
   int GetScore() const;
   int GetSize() const;
 
-  void CheckGameIsPaused(Controller const &controller, bool &running);
-  void CheckGameIsPaused(int &tempPause, bool &running);
-  void CheckGameIsPaused(int &tempPause);
-  void SaveScore();
-
  private:
   Snake snake;
   SDL_Point food;
@@ -33,10 +28,6 @@ class Game {
 
   void PlaceFood();
   void Update();
-};
-
-namespace Path {
-  const std::string filename{"Record.txt"};
 };
 
 #endif

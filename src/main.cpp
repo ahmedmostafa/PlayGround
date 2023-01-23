@@ -2,7 +2,6 @@
 #include "controller.h"
 #include "game.h"
 #include "renderer.h"
-#include <memory>
 
 int main() {
   constexpr std::size_t kFramesPerSecond{60};
@@ -18,7 +17,6 @@ int main() {
   game.Run(controller, renderer, kMsPerFrame);
   std::cout << "Game has terminated successfully!\n";
   std::cout << "Score: " << game.GetScore() << "\n";
-  if(game.GetScore() > 0 ) game.SaveScore();              // Score only is saved if it's greater than 0
   std::cout << "Size: " << game.GetSize() << "\n";
   return 0;
 }

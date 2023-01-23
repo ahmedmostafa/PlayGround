@@ -10,7 +10,6 @@ class Controller {
  private:
   void ChangeDirection(Snake &snake, Snake::Direction input,
                        Snake::Direction opposite) const;
-  void IncreaseSpeed(Snake &snake) const;
 };
 
 #endif

@@ -1,37 +1,6 @@
 #include "game.h"
 #include <iostream>
 #include "SDL.h"
-#include <fstream>
-#include <string>
-#include <vector>
-#include <sstream>
-#include <algorithm>
-
-template <typename T> 
-T GetPreviousScores()
-{
-    T PrevRecord = 0;
-    std::vector<int> PreviousScoreVec;
-    std::ifstream stream(Path::filename);
-    std::string line;
-    int number;
-    if (stream.is_open()) 
-    {
-        while (getline(stream, line)) 
-        {
-            std::istringstream linestream(line);
-            linestream >> number;
-            PreviousScoreVec.push_back(number);
-            
-        }  
-
-        sort(PreviousScoreVec.begin(), PreviousScoreVec.end(), std::greater<int>());
-        PrevRecord = PreviousScoreVec.front();                                // Save previous record to see if the player beat the record. 
-        stream.close();
-    }
-
-    return PrevRecord;
-}
 
 Game::Game(std::size_t grid_width, std::size_t grid_height)
     : snake(grid_width, grid_height),
@@ -51,9 +20,6 @@ void Game::Run(Controller const &controller, Renderer &renderer,
   bool running = true;
 
   while (running) {
-    
-    CheckGameIsPaused(controller, running); // Check if the game was paused
-    
     frame_start = SDL_GetTicks();
 
     // Input, Update, Render - the main game loop.
@@ -119,53 +85,3 @@ void Game::Update() {
 
 int Game::GetScore() const { return score; }
 int Game::GetSize() const { return snake.size; }
-
-// Logic to pause the game
-void Game::CheckGameIsPaused(Controller const &controller, bool &running)
-{
-    int tempPause = 0;
-    CheckGameIsPaused(tempPause);
-
-    while(snake.pause == true){
-      controller.HandleInput(running, snake);
-    }
-    CheckGameIsPaused(tempPause, running);
-}
-
-// Print message if game is paused
-void Game::CheckGameIsPaused(int &tempPause)
-{
-  if(snake.pause)
-  {
-    std::cout << "Game paused." << std::endl;
-    tempPause = 1;
-  }
-}
-
-// Print message if game is unpaused after has been paused
-void Game::CheckGameIsPaused(int &tempPause, bool &running)
-{
-  if(!snake.pause && tempPause)
-  {
-    std::cout << "Game unpaused." << std::endl;
-    tempPause = 0;
-  }
-}
-
-// Save the player's score and check for record beaten
-void Game::SaveScore()
-{
-    // Getting previous record (if exists) and checking if record was beaten
-    if((GetScore() > GetPreviousScores<int>()) && GetPreviousScores<int>() != 0){
-      std::cout << std::endl << "Congragulations. You beat the record!" << std::endl;
-    }
-
-    // Saving score in a file
-    std::ofstream of(Path::filename, std::ios::app);
-    if (of.is_open())
-    {
-        of << GetScore() << "\n";
-        std::cout << "Score saved!\n";
-        of.close();
-    }
-}

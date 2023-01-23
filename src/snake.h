@@ -28,8 +28,6 @@ class Snake {
   float head_y;
   std::vector<SDL_Point> body;
 
-  bool pause{false};
-
  private:
   void UpdateHead();
   void UpdateBody(SDL_Point &current_cell, SDL_Point &prev_cell);
