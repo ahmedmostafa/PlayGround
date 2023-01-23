@@ -9,19 +9,20 @@
 
 class Game {
  public:
-  Game(std::size_t grid_width, std::size_t grid_height,
-      std::size_t border_width, std::size_t border_height);
+  Game(std::size_t grid_width, std::size_t grid_height);
   void Run(Controller const &controller, Renderer &renderer,
            std::size_t target_frame_duration);
   int GetScore() const;
   int GetSize() const;
 
+  void CheckGameIsPaused(Controller const &controller, bool &running);
+  void CheckGameIsPaused(int &tempPause, bool &running);
+  void CheckGameIsPaused(int &tempPause);
+  void SaveScore();
+
  private:
   Snake snake;
   SDL_Point food;
-  SDL_Point obstacle;
-  std::size_t border_width, border_height;
-  std::size_t grid_width, grid_height;
 
   std::random_device dev;
   std::mt19937 engine;
@@ -31,8 +32,11 @@ class Game {
   int score{0};
 
   void PlaceFood();
-  void PlaceObstacle();
   void Update();
+};
+
+namespace Path {
+  const std::string filename{"Record.txt"};
 };
 
 #endif

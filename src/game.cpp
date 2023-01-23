@@ -1,19 +1,44 @@
 #include "game.h"
 #include <iostream>
 #include "SDL.h"
+#include <fstream>
+#include <string>
+#include <vector>
+#include <sstream>
+#include <algorithm>
 
-Game::Game(std::size_t grid_width, std::size_t grid_height,
-    std::size_t border_width, std::size_t border_height)
+template <typename T> 
+T GetPreviousScores()
+{
+    T PrevRecord = 0;
+    std::vector<int> PreviousScoreVec;
+    std::ifstream stream(Path::filename);
+    std::string line;
+    int number;
+    if (stream.is_open()) 
+    {
+        while (getline(stream, line)) 
+        {
+            std::istringstream linestream(line);
+            linestream >> number;
+            PreviousScoreVec.push_back(number);
+            
+        }  
+
+        sort(PreviousScoreVec.begin(), PreviousScoreVec.end(), std::greater<int>());
+        PrevRecord = PreviousScoreVec.front();                                // Save previous record to see if the player beat the record. 
+        stream.close();
+    }
+
+    return PrevRecord;
+}
+
+Game::Game(std::size_t grid_width, std::size_t grid_height)
     : snake(grid_width, grid_height),
       engine(dev()),
-      border_width(border_width),
-      border_height(border_height),
-      grid_width(grid_width),
-      grid_height(grid_height),
       random_w(0, static_cast<int>(grid_width - 1)),
       random_h(0, static_cast<int>(grid_height - 1)) {
   PlaceFood();
-  PlaceObstacle();
 }
 
 void Game::Run(Controller const &controller, Renderer &renderer,
@@ -26,40 +51,35 @@ void Game::Run(Controller const &controller, Renderer &renderer,
   bool running = true;
 
   while (running) {
+    
+    CheckGameIsPaused(controller, running); // Check if the game was paused
+    
     frame_start = SDL_GetTicks();
 
-    if (!renderer.GetInit())
-    {
-        renderer.Render(snake, food, obstacle, score);
+    // Input, Update, Render - the main game loop.
+    controller.HandleInput(running, snake);
+    Update();
+    renderer.Render(snake, food);
+
+    frame_end = SDL_GetTicks();
+
+    // Keep track of how long each loop through the input/update/render cycle
+    // takes.
+    frame_count++;
+    frame_duration = frame_end - frame_start;
+
+    // After every second, update the window title.
+    if (frame_end - title_timestamp >= 1000) {
+      renderer.UpdateWindowTitle(score, frame_count);
+      frame_count = 0;
+      title_timestamp = frame_end;
     }
-    else
-    {
-        // Input, Update, Render - the main game loop.
-        controller.HandleInput(running, snake);
-        Update();
-        //Vidhya: Added obstacle
-        renderer.Render(snake, food, obstacle, score);
 
-        frame_end = SDL_GetTicks();
-
-        // Keep track of how long each loop through the input/update/render cycle
-        // takes.
-        frame_count++;
-        frame_duration = frame_end - frame_start;
-
-        // After every second, update the window title.
-        if (frame_end - title_timestamp >= 1000) {
-            renderer.UpdateWindowTitle(score, frame_count);
-            frame_count = 0;
-            title_timestamp = frame_end;
-        }
-
-        // If the time for this frame is too small (i.e. frame_duration is
-        // smaller than the target ms_per_frame), delay the loop to
-        // achieve the correct frame rate.
-        if (frame_duration < target_frame_duration) {
-            SDL_Delay(target_frame_duration - frame_duration);
-        }
+    // If the time for this frame is too small (i.e. frame_duration is
+    // smaller than the target ms_per_frame), delay the loop to
+    // achieve the correct frame rate.
+    if (frame_duration < target_frame_duration) {
+      SDL_Delay(target_frame_duration - frame_duration);
     }
   }
 }
@@ -71,29 +91,9 @@ void Game::PlaceFood() {
     y = random_h(engine);
     // Check that the location is not occupied by a snake item before placing
     // food.
-    //Vidhya: Also make sure food is not placed in the border
-    if (!snake.SnakeCell(x, y) && x>0 && x<grid_width-1 &&
-        y>0 && y<grid_height-1) {
+    if (!snake.SnakeCell(x, y)) {
       food.x = x;
       food.y = y;
-      return;
-    }
-  }
-}
-
-void Game::PlaceObstacle() {
-  int x, y;
-  while (true) {
-    x = random_w(engine);
-    y = random_h(engine);
-    // Check that the location is not occupied by a snake item before placing
-    // food. 
-    //Vidhya: Also make sure obstacle is not placed in the border.
-    if (!snake.SnakeCell(x, y) && x>0 && x<grid_width-1 &&
-        y>0 && y<grid_height-1) {
-      obstacle.x = x;
-      obstacle.y = y;
-
       return;
     }
   }
@@ -115,20 +115,57 @@ void Game::Update() {
     snake.GrowBody();
     snake.speed += 0.02;
   }
-  
-  //Vidhya: Check if there's obstacle over here
-  if (obstacle.x == new_x && obstacle.y == new_y) {
-    
-    snake.alive = false;
-  }
-
-  //Vidhya: Check if snake touched the border
-  if (new_x==0 || new_y==border_width ||
-      new_y==0 || new_y==border_height) {
-
-      snake.alive = false;
-  }
 }
 
 int Game::GetScore() const { return score; }
 int Game::GetSize() const { return snake.size; }
+
+// Logic to pause the game
+void Game::CheckGameIsPaused(Controller const &controller, bool &running)
+{
+    int tempPause = 0;
+    CheckGameIsPaused(tempPause);
+
+    while(snake.pause == true){
+      controller.HandleInput(running, snake);
+    }
+    CheckGameIsPaused(tempPause, running);
+}
+
+// Print message if game is paused
+void Game::CheckGameIsPaused(int &tempPause)
+{
+  if(snake.pause)
+  {
+    std::cout << "Game paused." << std::endl;
+    tempPause = 1;
+  }
+}
+
+// Print message if game is unpaused after has been paused
+void Game::CheckGameIsPaused(int &tempPause, bool &running)
+{
+  if(!snake.pause && tempPause)
+  {
+    std::cout << "Game unpaused." << std::endl;
+    tempPause = 0;
+  }
+}
+
+// Save the player's score and check for record beaten
+void Game::SaveScore()
+{
+    // Getting previous record (if exists) and checking if record was beaten
+    if((GetScore() > GetPreviousScores<int>()) && GetPreviousScores<int>() != 0){
+      std::cout << std::endl << "Congragulations. You beat the record!" << std::endl;
+    }
+
+    // Saving score in a file
+    std::ofstream of(Path::filename, std::ios::app);
+    if (of.is_open())
+    {
+        of << GetScore() << "\n";
+        std::cout << "Score saved!\n";
+        of.close();
+    }
+}

@@ -9,6 +9,11 @@ void Controller::ChangeDirection(Snake &snake, Snake::Direction input,
   return;
 }
 
+  void Controller::IncreaseSpeed(Snake &snake) const{
+    snake.speed += 0.01;
+    std::cout << "Speed increased. Current speed: " << snake.speed<< std::endl;
+  }
+
 void Controller::HandleInput(bool &running, Snake &snake) const {
   SDL_Event e;
   while (SDL_PollEvent(&e)) {
@@ -35,6 +40,15 @@ void Controller::HandleInput(bool &running, Snake &snake) const {
           ChangeDirection(snake, Snake::Direction::kRight,
                           Snake::Direction::kLeft);
           break;
+
+        case SDLK_ESCAPE:
+          snake.pause = (snake.pause == false) ? true : false;
+          break;
+
+        case SDLK_SPACE:
+          IncreaseSpeed(snake);
+          break;
+          
       }
     }
   }
