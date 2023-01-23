@@ -10,10 +10,7 @@ class Snake {
   enum class Direction { kUp, kDown, kLeft, kRight };
 
   Snake(int grid_width, int grid_height)
-      : grid_width(grid_width),
-        grid_height(grid_height),
-        head_x(grid_width / 2),
-        head_y(grid_height / 2) {}
+      : grid_width(grid_width), grid_height(grid_height), head_x(0.5*grid_width), head_y(0.5*grid_height / 2) {}
 
   void Update();
 
@@ -38,54 +35,56 @@ class Snake {
   int grid_height;
 };
 
-class SnakeFeed
+class SnakeFood
 {
 public:
+    SnakeFood();
     // Constructor & destructor
-    SnakeFeed(int posX, int posY, int scoreVal, std::string foodName)
-        : x_(posX), y_(posY), val_(scoreVal), name_(foodName) {}
+    SnakeFood(int posX, int posY)
+        : x_(posX), y_(posY), color_({153, 153, 255}), val_(1){}
 
     // Overloaded constructor
-    // foodColor is RGB color, size is always 3
-    SnakeFeed(int posX, int posY, int scoreVal, std::string foodName, std::vector<int> foodColor)
-        : x_(posX), y_(posY), val_(scoreVal), name_(foodName), color_(foodColor) {}
+    SnakeFood(int posX, int posY, std::vector<int> foodColor, int val)
+        : x_(posX), y_(posY), color_(foodColor), val_(val) {}
 
     // get and set methods
-    void setX(int x) { x_ = x; }
-    int getX() { return x_; }
+    void setFoodXPos(int x) { x_ = x; }
+    int getFoodXPos() { return x_; }
 
-    void setY(int y) { y_ = y; }
-    int getY() { return y_; }
+    void setFoodYPos(int y) { y_ = y; }
+    int getFoodYPos() { return y_; }
 
     void setVal(int v) { val_ = v; }
     int getVal() { return val_; }
 
-    void setName(std::string n) { name_ = n; }
-    std::string getName() { return name_; }
-
     void setColor(std::vector<int> c) { color_ = c; }
     std::vector<int> getColor() { return color_; }
-private:
+
     int x_{0};
     int y_{0};
-    int val_{0};
-    std::string name_{"Default"};
-    std::vector<int> color_ = {255, 255, 0}; // initial color as yellow
+    int val_{1};
+    std::vector<int> color_ = {153, 153, 255}; // initial color as yellow
+
 };
 
-/*good foods*/
-// dFood: default food will increase speed
-class SetFeed : public SnakeFeed
+
+class SnakeSnacks : public SnakeFood
 {
 public:
-    SetFeed(int x, int y) : SnakeFeed(x, y, 1, "Default") {}
+    SnakeSnacks(int x, int y) : SnakeFood(x, y, {153, 153, 255}, 1) {}
 };
 
-// SuperFood: super food will add a lot score (20), color white
-class SetSuperFeed : public SnakeFeed
+class SnakeBooster : public SnakeFood
 {
 public:
-    SetSuperFeed(int x, int y) : SnakeFeed(x, y, 20, "Superb", {230, 230, 250}) {}
+    SnakeBooster(int x, int y) : SnakeFood(x, y, {0,255,0}, 10) {}
+};
+
+
+class SnakePoison : public SnakeFood
+{
+public:
+    SnakePoison(int x, int y) : SnakeFood(x, y, {255,0,0}, 0) {}  
 };
 
 #endif

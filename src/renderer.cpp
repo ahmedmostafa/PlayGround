@@ -38,7 +38,7 @@ Renderer::~Renderer() {
   SDL_Quit();
 }
 
-void Renderer::Render(Snake const snake, SnakeFeed& snakeFeed)  {
+void Renderer::Render(Snake const snake, SnakeFood& snakefood)  {
   SDL_Rect block;
   block.w = screen_width / grid_width;
   block.h = screen_height / grid_height;
@@ -48,9 +48,9 @@ void Renderer::Render(Snake const snake, SnakeFeed& snakeFeed)  {
   SDL_RenderClear(sdl_renderer);
 
   // Render food
-  block.x = snakeFeed.getX() * block.w;
-  block.y = snakeFeed.getY() * block.h;
-  std::vector<int> feedColor = snakeFeed.getColor();
+  block.x = snakefood.getFoodXPos() * block.w;
+  block.y = snakefood.getFoodYPos() * block.h;
+  std::vector<int> feedColor = snakefood.getColor();
   SDL_SetRenderDrawColor(sdl_renderer,feedColor[0], feedColor[1], feedColor[2], 255); 
   SDL_RenderFillRect(sdl_renderer, &block);
 

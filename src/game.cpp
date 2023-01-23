@@ -2,6 +2,7 @@
 #include <iostream>
 #include "SDL.h"
 
+
 Game::Game(std::size_t grid_width, std::size_t grid_height)
     : snake(grid_width, grid_height),
       engine(dev()),
@@ -25,7 +26,7 @@ void Game::Run(Controller const &controller, Renderer &renderer,
     // Input, Update, Render - the main game loop.
     controller.HandleInput(running, snake);
     Update();
-    renderer.Render(snake, feed_place);
+    renderer.Render(snake, snakeFood);
 
     frame_end = SDL_GetTicks();
 
@@ -50,31 +51,34 @@ void Game::Run(Controller const &controller, Renderer &renderer,
   }
 }
 
-enum Food { nfood, poison, booster };
+enum Food { snack, poison, booster };
 
-bool Game::getFoodType()
+int timer_3_sec_start = 0;
+int timer_3_sec_end = 0;
+void Game::setFood(int& x, int& y)
 {
       
   std::random_device ldev;     // only used once to initialise (seed) engine
   std::mt19937 rand_no(ldev());    // random-number engine used (Mersenne-Twister in this case)
   std::uniform_int_distribution<int> tempFood(0,2); // guaranteed unbiased
   bool tmpRet = false;
-
   auto random_FeedIndex = tempFood(rand_no);
+  std::vector<int> tmpFoodColor {3,0};
+
   switch((Food)random_FeedIndex){
     case booster:
-      //feed_place = SetFeed(x,y);
-      tmpRet = true;
+      snakeFood.setColor(tmpFoodColor);
+       snakeFood = SnakeBooster(x,y);
       break;
     case poison:
-      //feed_place = SetSuperFeed(x,y);
-      tmpRet = false;
+      snakeFood.setColor(tmpFoodColor);
+      snakeFood = SnakePoison(x,y);
+      timer_3_sec_start = SDL_GetTicks();
       break;
-    case nfood:
-      //feed_place = SetFeed(x,y);
-      tmpRet = true;
+    case snack:
+      snakeFood.setColor(tmpFoodColor);
+      snakeFood = SnakeSnacks(x,y);
   }
-  return tmpRet;
 }
 
 void Game::PlaceFood() {
@@ -85,9 +89,7 @@ void Game::PlaceFood() {
     // Check that the location is not occupied by a snake item before placing
     // food.
     if (!snake.SnakeCell(x, y)) {
-      (void)getFoodType();
-      feed_place = SetFeed(x,y);
-     // feed_place.y = y;
+      setFood(x,y);
       return;
     }
   }
@@ -102,12 +104,26 @@ void Game::Update() {
   int new_y = static_cast<int>(snake.head_y);
 
   // Check if there's food over here
-  if (feed_place.getX() == new_x && feed_place.getY() == new_y) {
-  //  score++;
+  timer_3_sec_end = SDL_GetTicks();
+
+  if ((snakeFood.getFoodXPos() == new_x && snakeFood.getFoodYPos() == new_y )) {
+    if(snakeFood.getVal() == 0)
+    {
+      snake.alive = false;
+      return;        
+    }
+
+    score += snakeFood.getVal(); 
     PlaceFood();
     // Grow snake and increase speed.
     snake.GrowBody();
     snake.speed += 0.02;
+  }
+  else if ((snakeFood.getVal() == 0) && ((timer_3_sec_end - timer_3_sec_start) >= 3000))
+  {
+    timer_3_sec_start = 0;
+    timer_3_sec_end = 0;
+    PlaceFood();
   }
 }
 
