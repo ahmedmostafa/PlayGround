@@ -17,7 +17,8 @@ class Game {
 
  private:
   Snake snake;
-  SDL_Point food;
+   //SDL_Point food;
+  SnakeFeed feed_place = SetFeed(0,0);
 
   std::random_device dev;
   std::mt19937 engine;
@@ -25,7 +26,7 @@ class Game {
   std::uniform_int_distribution<int> random_h;
 
   int score{0};
-
+  bool getFoodType();
   void PlaceFood();
   void Update();
 };
