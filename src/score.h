@@ -16,6 +16,7 @@ public:
     void SaveScore(int score);
     int getHighScore();
     int updateHighScore();
+    int getLastHighestScore();
 
 private:
     int highScore{0};

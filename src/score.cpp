@@ -1,6 +1,7 @@
 #include "score.h"
 #include <fstream>
 #include <algorithm>
+#include <vector>
 
 Score::Score()
     :highScore(0)
@@ -16,22 +17,53 @@ int Score::getHighScore()
 void Score::SaveScore(int score)
 {
     ofstream _boardFile;
-   _boardFile.open("ScoreBoard.txt", fstream::app);
+   _boardFile.open("scores.txt", fstream::app);
    _boardFile << "Player_Score: " << score << "\n";
    _boardFile.close();
 }
 
+int Score::getLastHighestScore()
+{
+    ifstream fSavedScores;
+    string line;
+    string key;
+    int value;
+    int hScore{0};
+    std::vector<int> savedScores;
+
+    fSavedScores.open("scores.txt");
+    if(fSavedScores.is_open())
+    {
+        while(std::getline(fSavedScores, line))
+        {
+            std::istringstream linestream(line);
+            linestream >> key >> value;
+            if(key == "Player_Score:")
+            {
+                savedScores.push_back(value);
+            }
+        }
+        hScore = *std::max_element(savedScores.begin(), savedScores.end());
+        fSavedScores.close();
+    } 
+    highScore = hScore;     
+    return highScore;
+}
+
+
+
+
 int Score::updateHighScore()
 {
-    ifstream _scoreBoard;
+    ifstream fSavedScores;
     string line;
     string key;
     int value;
 
-    _scoreBoard.open("ScoreBoard.txt");
-    if(_scoreBoard.is_open())
+    fSavedScores.open("scores.txt");
+    if(fSavedScores.is_open())
     {
-        while(std::getline(_scoreBoard, line))
+        while(std::getline(fSavedScores, line))
         {
             std::istringstream linestream(line);
             linestream >> key >> value;
@@ -44,7 +76,7 @@ int Score::updateHighScore()
             }
         }
     }
-    _scoreBoard.close();
+    fSavedScores.close();
     return highScore;
 }
 

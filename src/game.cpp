@@ -19,6 +19,7 @@ void Game::Run(Controller const &controller, Renderer &renderer,
   Uint32 frame_duration;
   int frame_count = 0;
   bool running = true;
+  int latestHighScore = recordScore.getLastHighestScore();
 
   while (running) {
     frame_start = SDL_GetTicks();
@@ -40,7 +41,7 @@ void Game::Run(Controller const &controller, Renderer &renderer,
 
     // After every second, update the window title.
     if (frame_end - title_timestamp >= 1000) {
-      renderer.UpdateWindowTitle(score, frame_count);
+      renderer.UpdateWindowTitle(score, latestHighScore, frame_count);
       frame_count = 0;
       title_timestamp = frame_end;
     }

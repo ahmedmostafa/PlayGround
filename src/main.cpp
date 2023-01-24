@@ -20,10 +20,10 @@ int main() {
   Score scoreRecord;
   scoreRecord.SaveScore(game.GetScore());
   scoreRecord.updateHighScore();
-  std::cout << "Your Score: " << game.GetScore() << ", Highest Score: "<< scoreRecord.getHighScore()<<"\n";
-  std::cout << "Size: " << game.GetSize() << "\n";
+  std::cout << "Your Score: " << game.GetScore() << ", Highest Score: "<< scoreRecord.getHighScore();
   if(game.GetScore() >= scoreRecord.getHighScore())
-    std::cout << " Well done!, you got it! \n";
+    std::cout << "\n Well done!, you got it!";
+  std::cout << "\n Size: " << game.GetSize() << "\n";
 
   return 0;
 }
