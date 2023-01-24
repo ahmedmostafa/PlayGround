@@ -2,6 +2,7 @@
 #include "controller.h"
 #include "game.h"
 #include "renderer.h"
+#include "score.h"
 
 int main() {
   constexpr std::size_t kFramesPerSecond{60};
@@ -16,7 +17,13 @@ int main() {
   Game game(kGridWidth, kGridHeight);
   game.Run(controller, renderer, kMsPerFrame);
   std::cout << "Game has terminated successfully!\n";
-  std::cout << "Score: " << game.GetScore() << "\n";
+  Score scoreRecord;
+  scoreRecord.SaveScore(game.GetScore());
+  scoreRecord.updateHighScore();
+  std::cout << "Your Score: " << game.GetScore() << ", Highest Score: "<< scoreRecord.getHighScore()<<"\n";
   std::cout << "Size: " << game.GetSize() << "\n";
+  if(game.GetScore() >= scoreRecord.getHighScore())
+    std::cout << " Well done!, you got it! \n";
+
   return 0;
 }
