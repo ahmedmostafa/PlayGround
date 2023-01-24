@@ -50,8 +50,8 @@ void Renderer::Render(Snake const snake, SnakeFood& snakefood)  {
   // Render food
   block.x = snakefood.getFoodXPos() * block.w;
   block.y = snakefood.getFoodYPos() * block.h;
-  std::vector<int> feedColor = snakefood.getColor();
-  SDL_SetRenderDrawColor(sdl_renderer,feedColor[0], feedColor[1], feedColor[2], 255); 
+  std::vector<int> foodColor = snakefood.getColor();
+  SDL_SetRenderDrawColor(sdl_renderer,foodColor[0], foodColor[1], foodColor[2], 255); 
   SDL_RenderFillRect(sdl_renderer, &block);
 
   // Render snake's body

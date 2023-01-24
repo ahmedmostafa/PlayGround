@@ -47,7 +47,6 @@ public:
     SnakeFood(int posX, int posY, std::vector<int> foodColor, int val)
         : x_(posX), y_(posY), color_(foodColor), val_(val) {}
 
-    // get and set methods
     void setFoodXPos(int x) { x_ = x; }
     int getFoodXPos() { return x_; }
 
@@ -63,7 +62,7 @@ public:
     int x_{0};
     int y_{0};
     int val_{1};
-    std::vector<int> color_ = {153, 153, 255}; // initial color as yellow
+    std::vector<int> color_ = {153, 153, 255};
 
 };
 
