@@ -51,6 +51,13 @@ void Game::Run(Controller const &controller, Renderer &renderer,
     if (frame_duration < target_frame_duration) {
       SDL_Delay(target_frame_duration - frame_duration);
     }
+     if (!snake.alive)
+    {
+      running = false;
+      std::cout << "******************************************************" << std::endl
+                << "***                   GAME OVER                    ***" << std::endl
+                << "******************************************************" << std::endl;
+    }
   }
 }
 
@@ -73,7 +80,7 @@ void Game::setFood(int& x, int& y)
       break;
     case poison:
       snakeFood = SnakePoison(x,y);
-      poisonTimerStart = SDL_GetTicks(); // keep the posion for 3 seconds
+      poisonTimerStart = SDL_GetTicks(); // keep the posion for 5 seconds
       break;
     case snack:
       snakeFood = SnakeSnacks(x,y);
@@ -122,7 +129,7 @@ void Game::Update() {
     snake.speed += 0.02;
   }
 // check if 3 seconds already passed for the posion.
-  else if ((snakeFood.getVal() == 0) && ((poisonTimerEnd - poisonTimerStart) >= 3000))
+  else if ((snakeFood.getVal() == 0) && ((poisonTimerEnd - poisonTimerStart) >= 5000))
   {
     poisonTimerStart = 0;
     poisonTimerEnd = 0;
