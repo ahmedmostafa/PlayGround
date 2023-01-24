@@ -77,3 +77,16 @@ bool Snake::SnakeCell(const int &x, const int &y) {
   }
   return false;
 }
+
+bool Snake::checkGamePaused()
+{
+  return gamePaused;
+}
+
+void Snake::pauseResume() 
+{
+  if(checkGamePaused())
+    gamePaused = false;
+  else
+    gamePaused = true;
+}

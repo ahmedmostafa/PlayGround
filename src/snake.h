@@ -16,6 +16,8 @@ class Snake {
 
   void GrowBody();
   bool SnakeCell(const int &x, const int &y);
+  bool checkGamePaused();
+  void pauseResume();
 
   Direction direction = Direction::kUp;
 
@@ -33,6 +35,7 @@ class Snake {
   bool growing{false};
   int grid_width;
   int grid_height;
+  bool gamePaused = false;
 };
 
 class SnakeFood
